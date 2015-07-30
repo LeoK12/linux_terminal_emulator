@@ -12,6 +12,7 @@
 int main(void){
 	int rc = 0;
 	char slaveName[PATH_MAX] = {0};
+	char input[BUFFER_SIZE] = {0};
 	char buffer[BUFFER_SIZE] = {0};
 	int count = 0;
 	int masterFD;
@@ -26,13 +27,24 @@ int main(void){
 		_exit(0);
 	}
 
-	printf("slaveName = %s\n", slaveName);
-	write(masterFD, INPUT_CMD, strlen(INPUT_CMD));
 	while(1){
+		memset(buffer, 0, sizeof(buffer));
 		count = read(masterFD, buffer, 1024);	
 		if (count){
-			printf("buffer = %s", buffer);
+			int i = 0;
+			for (;i<count;i++){
+				printf("%c", buffer[i]);
+			}
 		}
+
+		scanf("%s", (char*)&input);
+		if (!strcmp(input, "exit")){
+			break;
+		}
+		input[strlen(input)] = '\n';
+		input[strlen(input)] = 0;
+		write(masterFD, input, strlen(input));
+		fsync(masterFD);
 	}
 
 out:
